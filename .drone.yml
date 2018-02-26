@@ -1,0 +1,20 @@
+pipeline:
+  dev-retrieve-artifacts:
+    image: cgswong/aws:s3cmd
+#    when:
+#      environment: dev
+#      event: deployment
+    environment:
+      - BUCKET=dev.k8s.iot.arduino.cc
+      - OBJECT=dev.k8s.iot.arduino.cc/
+    commands: 
+      - s3cmd --access_key=$ACCESS_KEY --secret_key=$SECRET_KEY --recursive --skip-existing get s3://$BUCKET/$OBJECT
+      - s3cmd --access_key=$ACCESS_KEY --secret_key=$SECRET_KEY --recursive --skip-existing get s3://$BUCKET/kubeconfig
+
+  dev-deploy-hono:
+    image: lachlanevenson/k8s-kubectl
+ #   when:
+ #     environment: dev
+ #     event: deployment
+    commands:
+      - kubectl get po -n kube-system --kubeconfig=/drone/src/kubeconfig
